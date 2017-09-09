@@ -78,7 +78,7 @@ class AccountApproved extends Notification
             ->iOS()
             ->badge(1)
             ->sound('success')
-            ->icon('ic-launcher) // required
+            ->icon('ic_launcher') // required
             ->title('Account Approved') // required
             ->body("Your {$notifiable->service} account was approved!");
     }
