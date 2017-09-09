@@ -30,7 +30,7 @@ This package makes it easy to send [Pusher push notifications](https://pusher.co
 You can install the package via composer:
 
 ``` bash
-composer require laravel-notification-channels/pusher-push-notifications
+composer require ahmadsafar/pusher-push-notifications dev-master
 ```
 
 You must install the service provider:
