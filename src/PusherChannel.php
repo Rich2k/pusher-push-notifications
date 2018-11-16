@@ -65,6 +65,6 @@ class PusherChannel
     {
         $class = str_replace('\\', '.', get_class($notifiable));
 
-        return $class.'.'.$notifiable->getKey();
+        return $class . '.' . $notifiable->getKey();
     }
 }
