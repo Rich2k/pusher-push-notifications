@@ -1,5 +1,5 @@
 {
-    "name": "laravel-notification-channels/pusher-push-notifications",
+    "name": "rich2k/pusher-push-notifications",
     "description": "Pusher native Push Notifications driver.",
     "keywords": [
         "pusher-push-notifications",
@@ -7,7 +7,7 @@
         "pusher",
         "notifications"
     ],
-    "homepage": "https://github.com/LaravelNotificationChannels/pusher-push-notifications",
+    "homepage": "https://github.com/clementblanco/pusher-push-notifications",
     "license": "MIT",
     "authors": [
         {

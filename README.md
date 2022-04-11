@@ -39,7 +39,7 @@ Also please note that prior to version 2.0, this package integrated with Pusher'
 You can install the package via composer:
 
 ``` bash
-composer require laravel-notification-channels/pusher-push-notifications
+composer require clementblanco/pusher-push-notifications:^1.0
 ```
 
 ### Setting up your Pusher account
