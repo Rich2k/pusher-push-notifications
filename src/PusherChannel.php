@@ -1,67 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NotificationChannels\PusherPushNotifications;
 
-use Pusher\Pusher;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Pusher\PushNotifications\PushNotifications;
+use Throwable;
 
 class PusherChannel
 {
-    /**
-     * @var \Pusher
-     */
-    protected $pusher;
+    public const INTERESTS = 'interests';
 
-    /**
-     * @var \Illuminate\Events\Dispatcher
-     */
-    private $events;
+    protected PushNotifications $beamsClient;
 
-    /**
-     * @param \Pusher $pusher
-     */
-    public function __construct(Pusher $pusher, Dispatcher $events)
+    private Dispatcher $events;
+
+    public function __construct(PushNotifications $beamsClient, Dispatcher $events)
     {
-        $this->pusher = $pusher;
+        $this->beamsClient = $beamsClient;
         $this->events = $events;
     }
 
     /**
      * Send the given notification.
      *
-     * @param mixed $notifiable
-     * @param \Illuminate\Notifications\Notification $notification
-     *
+     * @param  mixed  $notifiable
+     * @param  Notification  $notification
      * @return void
      */
-    public function send($notifiable, Notification $notification)
+    public function send($notifiable, Notification $notification): void
     {
-        $interest = $notifiable->routeNotificationFor('PusherPushNotifications')
-            ?: $this->interestName($notifiable);
+        $type = $notifiable->pushNotificationType ?? self::INTERESTS;
 
-        $response = $this->pusher->notify(
-            $interest,
-            $notification->toPushNotification($notifiable)->toArray(),
-            true
-        );
+        $data = $notifiable->routeNotificationFor('PusherPushNotifications')
+            ?: self::defaultName($notifiable);
 
-        if (! in_array($response['status'], [200, 202])) {
-            $this->events->fire(
-                new NotificationFailed($notifiable, $notification, 'pusher-push-notifications', $response)
+        try {
+            $notificationType = sprintf('publishTo%s', Str::ucfirst($type));
+
+            $this->beamsClient->{$notificationType}(
+                Arr::wrap($data),
+                $notification->toPushNotification($notifiable)->toArray()
+            );
+        } catch (Throwable $exception) {
+            $this->events->dispatch(
+                new NotificationFailed($notifiable, $notification, 'pusher-push-notifications')
             );
         }
     }
 
     /**
-     * Get the interest name for the notifiable.
+     * Get the default name for the notifiable.
      *
-     * @param $notifiable
-     *
+     * @param  mixed  $notifiable
      * @return string
      */
-    protected function interestName($notifiable)
+    public static function defaultName($notifiable): string
     {
         $class = str_replace('\\', '.', get_class($notifiable));
 
